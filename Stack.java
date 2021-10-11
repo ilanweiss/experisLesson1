@@ -1,7 +1,8 @@
 package com.exsperis;
 
 public class Stack {
-    private int[] stack;
+
+    private final int[] stack;
     private int topOfStack;
     private static final int capacity = 32;
 

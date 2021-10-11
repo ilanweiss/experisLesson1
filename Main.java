@@ -1,9 +1,5 @@
 package com.exsperis;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.List;
-
 public class Main {
 /**
  Stack: 32 int
@@ -35,12 +31,12 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Printing 1-32:");
         VM print1To32 = new VM(){};
-        int[] progThatPrints1to32 = {4,1,2,4,32,0,6,0,10,3,9,-4,1,10,4,11,9,-4};
-        print1To32.run(progThatPrints1to32);
+        int[] programThatPrints1to32 = {4,1,2,4,32,0,6,0,10,3,9,-4,1,10,4,11,9,-4};
+        print1To32.run(programThatPrints1to32);
         System.out.println("\n7 factorial equals:");
         VM sevenFactorial = new VM(){};
-        int[] progThatPrints7factorial = {4,1,2,4,7,0,6,10,3,9,-4,4,1,2,1,10,6,7,2,9,-5,3,11};
-        sevenFactorial.run(progThatPrints7factorial);
+        int[] programThatPrints7factorial = {4,1,2,4,7,0,6,10,3,9,-4,4,1,2,1,10,6,7,2,9,-5,3,11};
+        sevenFactorial.run(programThatPrints7factorial);
     }
 
 }

@@ -1,61 +1,67 @@
 package com.exsperis;
 
 public class VM{
-    private Stack stack;
-    private Register register;
-    private Alu alu;
+    private final Stack stack;
+    private final Register register;
+    private final Alu alu;
+    private Controller controller;
 
     public VM(){
         this.stack = new Stack();
         this.register = new Register();
         this.alu = new Alu(register);
+        this.controller = new Controller();
     }
 
     public void run(int[] prog){
-        for (int i = 0; i < prog.length; i++) {
-            int opcode = prog[i];
+
+        controller = new Controller(prog.length);
+        while(controller.hasNext()) {
+            int opcode = prog[controller.getCurrentInstruction()];
             switch (opcode) {
-                case 0:
+                case OpCode.pushAxToStack:
                     pushVal();
                     break;
-                case 1:
+                case OpCode.popStackToAX:
                     popVal();
                     break;
-                case 2:
-                    moveAxToBx();
+                case OpCode.moveAxToBx:
+                    register.moveAxToBx();
                     break;
-                case 3:
-                    moveBxToAx();
+                case OpCode.moveBxToAx:
+                    register.moveBxToAx();
                     break;
-                case 4:
-                    loadToAX(prog[++i]);
+                case OpCode.loadDataToAx:
+                    register.loadAx(prog[controller.getNextInstruction()]);
+                    controller.nextInstruction();
                     break;
-                case 5:
+                case OpCode.addBxToAx:
                     alu.addAxToBx();
                     break;
-                case 6:
+                case OpCode.subBxFromAx:
                     alu.subBxFromAx();
                     break;
-                case 7:
+                case OpCode.multiplyBxWithAx:
                     alu.multiplyAxWithBx();
                     break;
-                case 8:
+                case OpCode.divAxByBx:
                     alu.divAxByBx();
                     break;
-                case 9:
-                    i=i+prog[i+1]-1;
+                case OpCode.jumpTo:
+                    controller.jumpTo(prog[controller.getNextInstruction()]);
                     break;
-                case 10:
+                case OpCode.jumpIfAxIsZero:
                     if (register.AxisZero()){
-                        i = i+prog[i+1]-1;
+                        controller.jumpTo(prog[controller.getNextInstruction()]);
                     }else{
-                        i++;
+                        controller.nextInstruction();
                     }
                     break;
-                case 11:
-                    printAx(register.getAx());
+                case OpCode.printAx:
+                    print(register.getAx());
                     break;
             }
+            controller.nextInstruction();
         }
     }
 
@@ -75,19 +81,7 @@ public class VM{
         }
     }
 
-    private void moveAxToBx() {
-        register.moveAxToBx();
-    }
-
-    private void moveBxToAx() {
-        register.moveBxToAx();
-    }
-
-    private void loadToAX(int value){
-        register.loadAx(value);
-    }
-
-    private void printAx(int ax){
-        System.out.print(ax + " ");
+    private void print(int value){
+        System.out.printf("%d ",value);
     }
 }
