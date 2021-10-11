@@ -1,26 +1,17 @@
 package com.exsperis;
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.List;
 
 public class VM{
-    private static int[] stack;
-    private static int stackIndex;
-    private static int[] register;
-    private static boolean stackIsFull;
-    private static boolean stackOverflow;
+    private Stack stack;
+    private Register register;
+    private Alu alu;
 
     public VM(){
-        this.stack = new int[32];
-        this.stackIndex = 31;
-        this.register = new int[2];
-        this.stackIsFull = false;
-        this.stackOverflow = false;
+        this.stack = new Stack();
+        this.register = new Register();
+        this.alu = new Alu(register);
     }
 
-
-    public static void run(int[] prog){
-
+    public void run(int[] prog){
         for (int i = 0; i < prog.length; i++) {
             int opcode = prog[i];
             switch (opcode) {
@@ -40,90 +31,63 @@ public class VM{
                     loadToAX(prog[++i]);
                     break;
                 case 5:
-                    addAxToBx();
+                    alu.addAxToBx();
                     break;
                 case 6:
-                    subBxFromAx();
+                    alu.subBxFromAx();
                     break;
                 case 7:
-                    multAxWithBx();
+                    alu.multiplyAxWithBx();
                     break;
                 case 8:
-                    divAxByBx();
+                    alu.divAxByBx();
                     break;
                 case 9:
                     i=i+prog[i+1]-1;
                     break;
                 case 10:
-                    if (register[0] == 0){
+                    if (register.AxisZero()){
                         i = i+prog[i+1]-1;
                     }else{
                         i++;
                     }
                     break;
                 case 11:
-                    printAx(register[0]);
+                    printAx(register.getAx());
                     break;
             }
         }
     }
 
-    private static void moveVal(int value, int index,int[] arrayToMoveTo){
-        arrayToMoveTo[index]= value;
-    }
-
-    private static void pushVal(){
-        if (!stackIsFull) {
-            moveVal(register[0], stackIndex, stack);
-            stackIndex--;
-            if (stackIndex<0){
-                stackIsFull=true;
-            }
+    private void pushVal(){
+        if (!stack.isFull()) {
+            stack.push(register.getAx());
         }else {
-            register[0]=0;
+            register.loadAx(0);
         }
     }
 
-    private static void popVal(){
-        if (!stackOverflow){
-            moveVal(stack[++stackIndex], 0, register);
-            if (stackIndex>30){
-                stackOverflow=true;
-            }
+    private void popVal(){
+        if (!stack.isEmpty()){
+            register.loadAx(stack.pop());
         }else{
-            register[0]=0;
+            register.loadAx(0);
         }
     }
 
-    private static void moveAxToBx() {
-        moveVal(register[0],1,register);
+    private void moveAxToBx() {
+        register.moveAxToBx();
     }
 
-    private static void moveBxToAx() {
-        moveVal(register[1],0,register);
+    private void moveBxToAx() {
+        register.moveBxToAx();
     }
 
-    private static void loadToAX(int value){
-        moveVal(value,0,register);
+    private void loadToAX(int value){
+        register.loadAx(value);
     }
 
-    private static void addAxToBx() {
-        moveVal(register[0]+register[1],0,register);
-    }
-
-    private static void subBxFromAx() {
-        moveVal(register[0]-register[1],0,register);
-    }
-
-    private static void multAxWithBx() {
-        moveVal(register[0]*register[1],0,register);
-    }
-
-    private static void divAxByBx() {
-        moveVal(register[0]/register[1],0,register);
-    }
-
-    private static void printAx(int ax){
+    private void printAx(int ax){
         System.out.print(ax + " ");
     }
 }
