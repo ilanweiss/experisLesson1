@@ -21,12 +21,11 @@ public class Controller {
     public int getNextInstruction() {
         return nextInstruction;
     }
+
     public void jumpTo(int offset){
-        if(hasNext(offset)){
-                nextInstruction = currentInstruction + offset - 1;
+        nextInstruction = currentInstruction + offset - 1;
+        if(hasNext(nextInstruction)){
                 nextInstruction();
-        }else{
-        System.out.print("no more instructions");
         }
     }
     public void reset(int sizeOfProgramList){
@@ -38,16 +37,20 @@ public class Controller {
         if (hasNext()){
             currentInstruction = nextInstruction;
             nextInstruction++;
-        }else{
-            System.out.print("no more instructions");
         }
     }
 
-    public boolean hasNext(){
+    public void haltInstruction(){
+        nextInstruction = overflow;
+        nextInstruction();
+    }
+
+        public boolean hasNext(){
         return (nextInstruction <= overflow);
     }
-    private boolean hasNext(int offset){
-        return (currentInstruction + offset-1 < overflow && currentInstruction + offset-1 > underflow);
+
+    private boolean hasNext(int indexToCheck){
+        return ( indexToCheck < overflow && indexToCheck > underflow);
     }
 
 }

@@ -33,7 +33,7 @@ public class Register {
         bx = 0;
     }
 
-    public boolean AxisZero(){
+    public boolean AxIsZero(){
         return (ax==0);
     }
 }

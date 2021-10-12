@@ -1,5 +1,7 @@
 package com.exsperis;
 
+import static com.exsperis.OpCode.*;
+
 public class VM{
     private final Stack stack;
     private final Register register;
@@ -18,50 +20,86 @@ public class VM{
         controller = new Controller(prog.length);
         while(controller.hasNext()) {
             int opcode = prog[controller.getCurrentInstruction()];
-            switch (opcode) {
-                case OpCode.pushAxToStack:
-                    pushVal();
-                    break;
-                case OpCode.popStackToAX:
-                    popVal();
-                    break;
-                case OpCode.moveAxToBx:
-                    register.moveAxToBx();
-                    break;
-                case OpCode.moveBxToAx:
-                    register.moveBxToAx();
-                    break;
-                case OpCode.loadDataToAx:
-                    register.loadAx(prog[controller.getNextInstruction()]);
-                    controller.nextInstruction();
-                    break;
-                case OpCode.addBxToAx:
-                    alu.addAxToBx();
-                    break;
-                case OpCode.subBxFromAx:
-                    alu.subBxFromAx();
-                    break;
-                case OpCode.multiplyBxWithAx:
-                    alu.multiplyAxWithBx();
-                    break;
-                case OpCode.divAxByBx:
-                    alu.divAxByBx();
-                    break;
-                case OpCode.jumpTo:
-                    controller.jumpTo(prog[controller.getNextInstruction()]);
-                    break;
-                case OpCode.jumpIfAxIsZero:
-                    if (register.AxisZero()){
-                        controller.jumpTo(prog[controller.getNextInstruction()]);
-                    }else{
-                        controller.nextInstruction();
-                    }
-                    break;
-                case OpCode.printAx:
-                    print(register.getAx());
-                    break;
+            try {
+                dispatch(prog, opcode);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             controller.nextInstruction();
+        }
+    }
+
+    private void dispatch(int[] prog, int opcode) {
+        switch (opcode) {
+            case pushAxToStack:
+                pushVal();
+                break;
+            case popStackToAX:
+                popVal();
+                break;
+            case dup:
+                stack.dup();
+                break;
+            case moveAxToBx:
+                register.moveAxToBx();
+                break;
+            case moveBxToAx:
+                register.moveBxToAx();
+                break;
+            case loadDataToAx:
+                register.loadAx(prog[controller.getNextInstruction()]);
+                controller.nextInstruction();
+                break;
+            case addBxToAx:
+                alu.addAxToBx();
+                break;
+            case subBxFromAx:
+                alu.subBxFromAx();
+                break;
+            case multiplyBxWithAx:
+                alu.multiplyAxWithBx();
+                break;
+            case divAxByBx:
+                alu.divAxByBx();
+                break;
+            case halt:
+                controller.haltInstruction();
+                break;
+            case jumpTo:
+                controller.jumpTo(prog[controller.getNextInstruction()]);
+                break;
+            case jumpIfAxIsZero:
+                if (register.AxIsZero()){
+                    controller.jumpTo(prog[controller.getNextInstruction()]);
+                }else{
+                    controller.nextInstruction();
+                }
+                break;
+            case jumpIfAxIsBelowZero:
+                if (register.getAx()<0){
+                    controller.jumpTo(prog[controller.getNextInstruction()]);
+                }else{
+                    controller.nextInstruction();
+                }
+                break;
+            case jumpIfAxIsAboveZero:
+                if (register.getAx()>0){
+                    controller.jumpTo(prog[controller.getNextInstruction()]);
+                }else{
+                    controller.nextInstruction();
+                }
+                break;
+            case skipIfAxIsNotZero:
+                if (!(register.AxIsZero())){
+                    controller.nextInstruction();
+                }
+                break;
+            case printAx:
+                IO.print(register.getAx());
+                break;
+            case printChar:
+                IO.printChar(register.getAx());
+                break;
         }
     }
 
@@ -79,9 +117,5 @@ public class VM{
         }else{
             register.loadAx(0);
         }
-    }
-
-    private void print(int value){
-        System.out.printf("%d ",value);
     }
 }

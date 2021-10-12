@@ -35,4 +35,10 @@ public class Stack {
             return stack[topOfStack--];
         }
     }
+
+    public void dup(){
+        int valueToDuplicate = pop();
+        push(valueToDuplicate);
+        push(valueToDuplicate);
+    }
 }
